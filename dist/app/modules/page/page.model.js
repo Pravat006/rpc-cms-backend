@@ -1,0 +1,104 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Page = void 0;
+const mongoose_1 = __importStar(require("mongoose"));
+const mongooseToJSON_1 = __importDefault(require("../../utils/mongooseToJSON"));
+const section_schemas_1 = require("./section.schemas");
+const baseSectionSchema = new mongoose_1.Schema({
+    type: { type: String, required: true },
+    title: { type: String },
+    order: { type: Number, required: true },
+    settings: {
+        hideHeader: { type: Boolean },
+        reversed: { type: Boolean },
+        background: { type: String, enum: ["white", "gray", "primary"] },
+    },
+}, { discriminatorKey: 'type', _id: true });
+const pageSchema = new mongoose_1.Schema({
+    slug: { type: String, required: true, unique: true },
+    title: { type: String, required: true },
+    metaDescription: { type: String },
+    backgroundImage: { type: String, required: true },
+    sections: [baseSectionSchema],
+    isPublished: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
+}, {
+    timestamps: true,
+});
+// Define discriminators for the sections array
+const sectionsArray = pageSchema.path('sections');
+const createDiscriminator = (name, dataSchema) => {
+    sectionsArray.discriminator(name, new mongoose_1.Schema({ data: dataSchema }, { _id: false }));
+};
+createDiscriminator("page-header", section_schemas_1.PageHeaderSchema);
+createDiscriminator("about-hero", section_schemas_1.AboutHeroSchema);
+createDiscriminator("stats-section", section_schemas_1.StatsSectionSchema);
+createDiscriminator("quality-policy", section_schemas_1.QualityPolicySchema);
+createDiscriminator("facilities-grid", section_schemas_1.FacilitiesGridSchema);
+createDiscriminator("features-grid", section_schemas_1.FeaturesGridSchema);
+createDiscriminator("amenities-grid", section_schemas_1.HostelAmenitiesSchema);
+createDiscriminator("stats-counters", section_schemas_1.StatsCountersSchema);
+createDiscriminator("contact-cta", section_schemas_1.ContactCtaSchema);
+createDiscriminator("leadership-grid", section_schemas_1.LeadershipGridSchema);
+createDiscriminator("services-grid", section_schemas_1.ServicesGridSchema);
+createDiscriminator("testimonials", section_schemas_1.TestimonialsSchema);
+createDiscriminator("latest-news", section_schemas_1.LatestNewsSchema);
+createDiscriminator("info-card", section_schemas_1.InfoCardSchema);
+createDiscriminator("lab-details", section_schemas_1.LabDetailsSchema);
+createDiscriminator("route-charges", section_schemas_1.RouteChargesSchema);
+createDiscriminator("multi-image-carousel", section_schemas_1.MultiImageCarouselSchema);
+createDiscriminator("other-facilities-carousel", section_schemas_1.OtherFacilitiesSchema);
+createDiscriminator("eligibility-list", section_schemas_1.EligibilityListSchema);
+createDiscriminator("placement-team", section_schemas_1.PlacementTeamSchema);
+createDiscriminator("placement-activities", section_schemas_1.PlacementActivitiesSchema);
+createDiscriminator("contact-form", section_schemas_1.ContactFormSchema);
+createDiscriminator("address-section", section_schemas_1.AddressSectionSchema);
+createDiscriminator("google-map", section_schemas_1.GoogleMapSchema);
+// Generic/Empty fallbacks for others or generic types
+createDiscriminator("gallery-grid", section_schemas_1.EmptySchema);
+createDiscriminator("post-grid", section_schemas_1.EmptySchema);
+createDiscriminator("faculty-grid", section_schemas_1.EmptySchema);
+createDiscriminator("other-facilities", section_schemas_1.OtherFacilitiesSchema); // alias
+createDiscriminator("hero-slider", section_schemas_1.EmptySchema); // or specific if needed
+(0, mongooseToJSON_1.default)(pageSchema);
+pageSchema.index({ slug: 1 }, { unique: true });
+pageSchema.index({ isPublished: 1 });
+pageSchema.index({ createdAt: -1 });
+exports.Page = mongoose_1.default.models.Page || mongoose_1.default.model("Page", pageSchema);
+//# sourceMappingURL=page.model.js.map
