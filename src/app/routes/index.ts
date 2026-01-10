@@ -11,6 +11,7 @@ import { galleryRouter } from "@/modules/gallery/gallery.routes";
 import { testimonialRouter } from "@/modules/testimonial/testimonial.routes";
 import { NavigationRoutes } from "@/modules/navigation/navigation.routes";
 import { dashboardRouter } from "@/modules/dashboard/dashboard.routes";
+import { contactRouter } from "@/modules/contact/contact.routes";
 
 const router = Router();
 
@@ -64,6 +65,10 @@ const moduleRoutes: Route[] = [
   {
     path: '/navigation',
     route: NavigationRoutes
+  },
+  {
+    path: '/contacts',
+    route: contactRouter
   }
 ];
 
